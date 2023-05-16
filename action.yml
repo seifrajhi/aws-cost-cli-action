@@ -1,11 +1,49 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: aws-cost-cli-action
+description: Run AWS Cost CLI command
+
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  access-key:
+    description: 'AWS access key'
+    required: false
+  secret-key:
+    description: 'AWS secret key'
+    required: false
+  region:
+    description: 'AWS region'
+    required: false
+  profile:
+    description: 'AWS profile to use'
+    required: false
+    default: 'default'
+  json:
+    description: 'Get the output as JSON'
+    required: false
+    default: false
+  summary:
+    description: 'Get only the summary without service breakdown'
+    required: false
+    default: false
+  text:
+    description: 'Get the output as plain text (no colors / tables)'
+    required: false
+    default: false
+  slack-token:
+    description: 'Slack token for the Slack message'
+    required: false
+  slack-channel:
+    description: 'Slack channel to post the message to'
+    required: false
+
 runs:
   using: 'node16'
-  main: 'dist/index.js'
+  main: |
+    dist/index.js \
+      ${{ if inputs.profile }}--profile ${{ inputs.profile }}${{ endif }} \
+      ${{ if inputs.access-key }}--access-key ${{ inputs.access-key }}${{ endif }} \
+      ${{ if inputs.secret-key }}--secret-key ${{ inputs.secret-key }}${{ endif }} \
+      ${{ if inputs.region }}--region ${{ inputs.region }}${{ endif }} \
+      ${{ if inputs.summary }}--summary ${{ inputs.summary }}${{ endif }} \
+      ${{ if inputs.json }}--json${{ else if inputs.text }}--text${{ endif }} \
+      ${{ if inputs.slack-token }}--slack-token ${{ inputs.slack-token }}${{ endif }} \
+      ${{ if inputs.slack-channel }}--slack-channel ${{ inputs.slack-channel }}${{ endif }}
+
